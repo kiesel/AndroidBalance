@@ -25,6 +25,13 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>hcbifacade</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kap0tt</groupId>
+            <artifactId>hbci4java</artifactId>
+            <version>2.5.12</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
