@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import name.kiesel.hcbi.impl.HbciAccount;
 
 /**
  *
@@ -21,6 +22,7 @@ public class AccountRepository {
     private final Context ctx;
     private DatabaseHelper dbh;
     private SQLiteDatabase db;
+
 
     
     private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -69,5 +71,9 @@ public class AccountRepository {
             "bankcode",
             "name"
         }, null, null, null, null, null);
+    }
+    
+    public HbciAccount byAccountId(Long accountId) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

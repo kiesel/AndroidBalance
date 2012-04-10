@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+>
+
+  <TextView
+    android:text="@string/edit_account_account_number"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+  <TextEdit
+    android:id="@+id/edit_account_aid"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+       
+  <TextView
+    android:text="@string/edit_account_bank_code"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+  <TextEdit
+    android:id="@+id/edit_account_bankcode"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+       
+  <TextView
+    android:text="@string/edit_account_userid"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+  <TextEdit
+    android:id="@+id/edit_account_userid"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+       
+  <TextView
+    android:text="@string/edit_account_hbci_url"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+  <TextEdit
+    android:id="@+id/edit_account_hbciurl"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+       
+  <TextView
+    android:text="@string/edit_account_hbci_version"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+  <Spinner
+    android:id="@+id/edit_account_hbciver"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:prompt="@string/edit_account_askhbciversion"
+    />
+    
+  <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+  >
+    <Button
+      android:id="@+id/edit_account_cancel"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/cancel"
+        />
+    <Button
+      android:id="@+id/edit_account_save"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/save"
+        />
+  </LinearLayout>
+    
+</LinearLayout>
