@@ -4,15 +4,13 @@
  */
 package name.kiesel.androidbalance.repo;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import name.kiesel.androidbalance.R;
-import name.kiesel.hcbi.impl.HbciAccount;
-import name.kiesel.hcbi.impl.HbciCredentials;
+import java.util.LinkedList;
+import java.util.List;
+import name.kiesel.androidbalance.bean.AccountBean;
 
 /**
  *
@@ -21,20 +19,19 @@ import name.kiesel.hcbi.impl.HbciCredentials;
 public class AccountRepository {
     private static final String DATABASE_NAME= "accounts";
     private static final int DATABASE_VERSION= 1;
-    public static final String TITLE_COLUMN = "name";
-    private static final String[] ACCOUNT_COLUMNS = new String[] {
-            "_id",
-            "number",
-            "bankcode",
-            "hbciurl",
-            "hbciversion",
-            "userid",
-            "name"
-        };
+    
+    public static final String TABLE_ACCOUNT=   "account";
+    public static final String FIELD_ACCOUNT_NUMBER = "number";
+    public static final String FIELD_ACCOUNT_BANKCODE = "bankcode";
+    public static final String FIELD_ACCOUNT_HBCIURL = "hbciurl";
+    public static final String FIELD_ACCOUNT_HBCIVER= "hbicversion";
+    public static final String FIELD_ACCOUNT_USERID= "userid";
+    public static final String FIELD_ACCOUNT_NAME= "name";
 
     private final Context ctx;
     private DatabaseHelper dbh;
     private SQLiteDatabase db;
+    private final Object lock= new Object();
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
         
@@ -44,17 +41,15 @@ public class AccountRepository {
 
         @Override
         public void onCreate(SQLiteDatabase sqld) {
-            sqld.execSQL("create table accounts (" +
-                    "_id integer primary key autoincrement, " +
-                    "number text not null, " +
-                    "bankcode text not null, " +
-                    "hbciurl text null, " +
-                    "hbciversion text null, " +
-                    "name text not null, " +
-                    "userid text null)"
-            );
-            sqld.execSQL("insert into accounts (number, bankcode, name) values (\"8542130\", \"66090800\", \"Main account - BBBank\")");
-            sqld.execSQL("insert into accounts (number, bankcode, name) values (\"123456\", \"66090900\", \"Second account\")");
+            sqld.execSQL("CREATE TABLE " + TABLE_ACCOUNT + "("
+                    + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + FIELD_ACCOUNT_NAME + " TEXT NOT NULL, "
+                    + FIELD_ACCOUNT_NUMBER + " TEXT NOT NULL, "
+                    + FIELD_ACCOUNT_BANKCODE + " TEXT NOT NULL, "
+                    + FIELD_ACCOUNT_HBCIURL + " TEXT, "
+                    + FIELD_ACCOUNT_HBCIVER + " TEXT, "
+                    + FIELD_ACCOUNT_USERID + " TEXT)"
+                    );
         }
 
         @Override
@@ -77,48 +72,85 @@ public class AccountRepository {
     public void close() {
         this.dbh.close();
     }
-
-    public Cursor findAllAccounts() {
-        return this.db.query("accounts", ACCOUNT_COLUMNS, null, null, null, null, null);
-    }
     
-    public HbciAccount byAccountId(Long accountId) {
-        Cursor c= this.db.query("accounts", ACCOUNT_COLUMNS, "_id = ?", new String[] { String.valueOf(accountId) }, null, null, null);
-        
-        if (c.getCount() != 1) {
-            throw new IllegalArgumentException("Could not find proper account for id " + accountId);
+    public AccountBean saveAccount(AccountBean bean) {
+        long id;
+        synchronized(this.lock) {
+            id= this.db.insert(TABLE_ACCOUNT, null, bean.getValues());
         }
         
-        // FIXME
-        HbciAccount a= new HbciAccount(c.getString(1), c.getString(2));
-        a.getCredentials().setUserId(c.getString(5));
-        
-        return a;
+        bean.setId(id);
+        return bean;
     }
     
-    public void updateAccount(HbciAccount a) {
-    }
-
-    public void createOrUpdateAccount(HbciAccount a) {
-        ContentValues values= new ContentValues();
-        values.put("number", a.getAccountNumber());
-        values.put("bankcode", a.getBankCode());
-        values.putNull("hbciurl");
-        values.put("hbciversion", "300");
-        values.put("name", "New account");
-        values.put("userid", a.getCredentials().getUserId());
+    public void deleteAccount(AccountBean bean) {
+        if (-1 == bean.getId()) return;
         
-        Long rowId= this.db.insert("accounts", null, values);
-        Log.i("Created new account w/ id ", String.valueOf(rowId));
-    }
-
-    public static HbciAccount fromValues(String accountNumber, String bankCode, String userId, String hbciUrl, String hbciVersion) {
-        HbciAccount a= new HbciAccount(accountNumber, bankCode);
-        a.setCredentials(new HbciCredentials());
-        a.getCredentials().setUserId(userId);
-
-        return a;
+        synchronized(this.lock) {
+            this.db.delete(TABLE_ACCOUNT, "_id = ?", new String[] { String.valueOf(bean.getId()) });
+        }
     }
     
+    public AccountBean findAccountById(long id) {
+        List<AccountBean> list;
+        
+        synchronized(this.lock) {
+            Cursor c= this.db.query(TABLE_ACCOUNT, null, "_id = ?", new String[] { String.valueOf(id) }, null, null, null);
+            list= this.accountsFromCursor(c);
+            c.close();
+            
+        }
+        
+        if (list.size() > 0) {
+            return list.get(0);
+        }
+        
+        return null;
+    }
+    
+    public List<AccountBean> findAllAccounts() {
+        List<AccountBean> list;
+        synchronized(this.lock) {
+            Cursor c= this.db.query(TABLE_ACCOUNT, new String[] {
+                "_id",
+                FIELD_ACCOUNT_NAME,
+                FIELD_ACCOUNT_NUMBER,
+                FIELD_ACCOUNT_BANKCODE,
+                FIELD_ACCOUNT_USERID,
+                FIELD_ACCOUNT_HBCIURL,
+                FIELD_ACCOUNT_HBCIVER
+            }, null, null, null, null, null);
+            
+            list= this.accountsFromCursor(c);
+        }
+        
+        return list;
+    }
 
+    private List<AccountBean> accountsFromCursor(Cursor c) {
+        List<AccountBean> accounts= new LinkedList<AccountBean>();
+        
+        final int COL_ID= c.getColumnIndexOrThrow("_id"),
+                COL_NUMBER= c.getColumnIndexOrThrow(FIELD_ACCOUNT_NUMBER),
+                COL_BANKCODE= c.getColumnIndexOrThrow(FIELD_ACCOUNT_BANKCODE),
+                COL_NAME= c.getColumnIndexOrThrow(FIELD_ACCOUNT_NAME),
+                COL_HBCIURL= c.getColumnIndexOrThrow(FIELD_ACCOUNT_HBCIURL),
+                COL_HBCIVER= c.getColumnIndexOrThrow(FIELD_ACCOUNT_HBCIVER),
+                COL_USERID= c.getColumnIndexOrThrow(FIELD_ACCOUNT_USERID);
+        
+        while (c.moveToNext()) {
+            AccountBean b= new AccountBean();
+            b.setId(c.getLong(COL_ID));
+            b.setBankCode(c.getString(COL_BANKCODE));
+            b.setNumber(c.getString(COL_NUMBER));
+            b.setTitle(c.getString(COL_NAME));
+            b.setHbciUrl(c.getString(COL_HBCIURL));
+            b.setHbciVersion(c.getString(COL_HBCIVER));
+            b.setUserId(c.getString(COL_USERID));
+            
+            accounts.add(b);
+        }
+        
+        return accounts;
+    }
 }

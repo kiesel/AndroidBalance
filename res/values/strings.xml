@@ -5,11 +5,15 @@
   
   <string name="cancel">Cancel</string>
   <string name="save">Save</string>
+  <string name="ok">Ok</string>
   
+  <!-- Start screen -->
   <string name="main_no_accounts">No accounts configured.</string>
   <string name="main_menu_create">New account</string>
   <string name="main_menu_delete">Remove account</string>
+  <string name="main_confirm_save">Account was saved.</string>
     
+  <string name="edit_account_title">Name:</string>
   <string name="edit_account_account_number">Account number:</string>
   <string name="edit_account_bank_code">Bank code:</string>
   <string name="edit_account_userid">Username:</string>
@@ -23,4 +27,12 @@
     <item>Fin-TS (3.0.0)</item>
     <item>Plus</item>
   </string-array>
+  
+  <!-- TransactionsList screen -->
+  <string name="transactions_menu_fetch">Load transactions</string>
+  <string name="transactions_fetch_done">Finished loading transactions</string>
+  
+  <!-- Pin dialog -->
+  <string name="pin_dialog_title">Enter PIN</string>
+  <string name="pin_dialog_msg">PIN will not be stored to database... Give pin:</string>
 </resources>

@@ -7,6 +7,17 @@
 >
 
   <TextView
+    android:text="@string/edit_account_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    />
+  <EditText
+    android:id="@+id/edit_account_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    />
+       
+  <TextView
     android:text="@string/edit_account_account_number"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,6 +26,7 @@
     android:id="@+id/edit_account_aid"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:inputType="number"
     />
        
   <TextView
@@ -26,6 +38,7 @@
     android:id="@+id/edit_account_bankcode"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:inputType="number"
     />
        
   <TextView

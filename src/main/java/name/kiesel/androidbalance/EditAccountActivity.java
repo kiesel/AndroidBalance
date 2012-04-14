@@ -15,10 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import name.kiesel.androidbalance.bean.AccountBean;
 import name.kiesel.androidbalance.repo.AccountRepository;
-import name.kiesel.hcbi.impl.HbciAccount;
-import name.kiesel.hcbi.impl.HbciCredentials;
-import org.kapott.hbci.manager.HBCIUtils;
+import name.kiesel.hbci.impl.HbciAccount;
+import name.kiesel.hbci.impl.HbciSession;
 
 /**
  *
@@ -28,7 +28,7 @@ public class EditAccountActivity extends Activity {
 
     private Long accountId = null;
     private AccountRepository repository = null;
-    private HbciAccount account = null;
+    private AccountBean account = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,7 @@ public class EditAccountActivity extends Activity {
         }
 
         if (null != this.account) {
-            this.account = this.repository.byAccountId(this.accountId);
+            this.account = this.repository.findAccountById(accountId);
             this.fillData();
         }
 
@@ -70,7 +70,7 @@ public class EditAccountActivity extends Activity {
                 Editable bc = ((EditText) view).getText();
                 if (null != bc && bc.length() > 0) {
                     Log.d("Looking up host for bankcode: ", bc.toString());
-                    String host = HBCIUtils.getHBCIHostForBLZ(bc.toString());
+                    String host = new HbciSession(new HbciAccount("fake account", bc.toString())).hbciHost();
 
                     Log.d("Received host: ", host);
                     ((EditText) findViewById(R.id.edit_account_hbciurl)).setText(bc);
@@ -102,12 +102,15 @@ public class EditAccountActivity extends Activity {
 
             @Override
             public void onClick(View view) {
-                repository.createOrUpdateAccount(AccountRepository.fromValues(
-                        extractString(R.id.edit_account_aid),
-                        extractString(R.id.edit_account_bankcode),
-                        extractString(R.id.edit_account_userid),
-                        extractString(R.id.edit_account_hbciurl),
-                        "300"));// FIXME
+                AccountBean bean= new AccountBean();
+                
+                bean.setTitle(extractString(R.id.edit_account_title));
+                bean.setNumber(extractString(R.id.edit_account_aid));
+                bean.setBankCode(extractString(R.id.edit_account_bankcode));
+                bean.setUserId(extractString(R.id.edit_account_userid));
+                bean.setHbciUrl(extractString(R.id.edit_account_hbciurl));
+                bean.setHbciVersion("300"); // FIXME
+                repository.saveAccount(bean);
 
                 setResult(RESULT_OK);
                 finish();
@@ -116,7 +119,7 @@ public class EditAccountActivity extends Activity {
     }
 
     private void fillData() {
-        ((EditText) this.findViewById(R.id.edit_account_aid)).setText(this.account.getAccountNumber());
+        ((EditText) this.findViewById(R.id.edit_account_aid)).setText(this.account.getNumber());
         ((EditText) this.findViewById(R.id.edit_account_bankcode)).setText(this.account.getBankCode());
     }
 }
