@@ -13,7 +13,7 @@ import java.util.List;
 import name.kiesel.androidbalance.bean.AccountBean;
 import name.kiesel.androidbalance.repo.AccountRepository;
 
-public class HelloAndroidActivity extends ListActivity {
+public class ListAccountsActivity extends ListActivity {
     private static final String TAG= "AndroidBalance.Main";
     private static final int OPT_INSERT_ID  = Menu.FIRST;
     private static final int OPT_DELETE_ID  = Menu.FIRST + 1;
@@ -127,11 +127,43 @@ public class HelloAndroidActivity extends ListActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        
+        AccountBean bean= (AccountBean)info.targetView.getTag();
+        menu.setHeaderTitle(bean.getTitle());
+        info.id= bean.getId();
+        
+        
+        menu.add(0, OPT_INSERT_ID, 0, R.string.main_menu_modify);
         menu.add(0, OPT_DELETE_ID, 0, R.string.main_menu_delete);
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case OPT_INSERT_ID: {
+                this.editAccount(info.id);
+                return true;
+            }
+                
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     private void createAccount() {
+        Log.i(TAG, "Yield EditAccountActivity w/o id (create mode)");
         Intent i= new Intent(this, EditAccountActivity.class);
+        this.startActivityForResult(i, ACTIVITY_ACCOUNT_CREATE);
+    }
+    
+    private void editAccount(long id) {
+        Log.i(TAG, "Yield EditAccountActivity w/ id [" + id + "] (edit mode)");
+        Intent i= new Intent(this, EditAccountActivity.class);
+        i.putExtra(EditAccountActivity.ACCOUNTID, id);
         this.startActivityForResult(i, ACTIVITY_ACCOUNT_CREATE);
     }
 

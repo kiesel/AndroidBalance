@@ -45,7 +45,7 @@ public class TransactionsListActivity extends Activity {
         this.repository= new AccountRepository(this);
         this.repository.open();
         
-//        this.setContentView(R.layout.transaction_list);
+        this.setContentView(R.layout.transaction_list);
         
         accountId= null;
         if (null != savedInstanceState) {
@@ -129,5 +129,6 @@ public class TransactionsListActivity extends Activity {
         });
         
         alert.setNegativeButton(R.string.cancel, null);
+        alert.show();
     }
 }

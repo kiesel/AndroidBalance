@@ -53,11 +53,10 @@ public class AccountRepository {
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase sqld, int i, int i1) {
-            sqld.execSQL("drop table if exists accounts");
-            onCreate(sqld);
+        public void onUpgrade(SQLiteDatabase sqld, int oldVersion, int newVersion) {
+//            sqld.execSQL("drop table if exists accounts");
+//            onCreate(sqld);
         }
-        
     }
 
     public AccountRepository(Context ctx) {
