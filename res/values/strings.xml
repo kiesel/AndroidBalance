@@ -13,6 +13,7 @@
   <string name="main_menu_modify">Edit account</string>
   <string name="main_menu_delete">Remove account</string>
   <string name="main_confirm_save">Account was saved.</string>
+  <string name="main_confirm_delete">Account was deleted.</string>
     
   <string name="edit_account_title">Name:</string>
   <string name="edit_account_account_number">Account number:</string>

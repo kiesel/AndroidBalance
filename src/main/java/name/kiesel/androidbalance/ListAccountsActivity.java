@@ -21,7 +21,7 @@ public class ListAccountsActivity extends ListActivity {
     private static final int ACTIVITY_TRANSACTIONS_LIST = 1;
 
     private AccountRepository repository= null;
-    
+
     private static class AccountListAdapter extends ArrayAdapter<AccountBean> {
         private final List<AccountBean> list;
         private final Activity context;
@@ -88,8 +88,12 @@ public class ListAccountsActivity extends ListActivity {
 //        });
 
         this.registerForContextMenu(this.getListView());
-        
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.repository.close();
     }
 
     @Override
@@ -105,13 +109,6 @@ public class ListAccountsActivity extends ListActivity {
 
     private void fillAccounts() {
         List<AccountBean> list= this.repository.findAllAccounts();
-        
-//        String[] from= new String[] { AccountRepository.FIELD_ACCOUNT_NAME };
-//        int[] to= new int[] { R.id.account_item };
-//        
-////        SimpleAdapter adapter= new SimpleAdapter(this, list, R.layout.account_list_item, from, to);
-//        ArrayAdapter adapter= new ArrayAdapter(this, R.layout.account_list_item, list);
-//        this.setListAdapter(adapter);
         
         ArrayAdapter<AccountBean> adapter= new AccountListAdapter(this, list);
         this.setListAdapter(adapter);
@@ -149,11 +146,24 @@ public class ListAccountsActivity extends ListActivity {
                 return true;
             }
                 
+            case OPT_DELETE_ID: {
+                this.deleteAccount(info.id);
+                return true;
+            }
+                
             default:
                 return super.onContextItemSelected(item);
         }
     }
 
+    private void deleteAccount(long id) {
+        Log.i(TAG, "Deleteing account w/ id [" + id + "]");
+        AccountBean bean= this.repository.findAccountById(id);
+        this.repository.deleteAccount(bean);
+        
+        Toast.makeText(this, R.string.main_confirm_delete, Toast.LENGTH_LONG).show();
+    }
+    
     private void createAccount() {
         Log.i(TAG, "Yield EditAccountActivity w/o id (create mode)");
         Intent i= new Intent(this, EditAccountActivity.class);
