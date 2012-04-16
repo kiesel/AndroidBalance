@@ -7,7 +7,7 @@ bank accounts through the HBCI protocol. This protocol is used in Germany
 to request balance and transaction information over the Internet, as well
 as create new transactions and other jobs for managing your accounts.
 
-# Builing
+# Building
 AndroidBalance uses maven and the maven-android-plugin to build the apk file. To
 build the apk, just run ```mvn install```, to deploy the apk to an AVD or connected
 debug-enabled Android phone, use ```mvn android:deploy```.

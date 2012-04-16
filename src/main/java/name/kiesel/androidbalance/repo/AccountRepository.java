@@ -159,7 +159,6 @@ public class AccountRepository {
             Cursor c= this.db.query(TABLE_ACCOUNT, null, "_id = ?", new String[] { String.valueOf(id) }, null, null, null);
             list= this.accountsFromCursor(c);
             c.close();
-            
         }
         
         if (list.size() > 0) {
@@ -272,6 +271,14 @@ public class AccountRepository {
             return this.insertTransaction(bean);
         } else {
             return this.updateTransaction(bean);
+        }
+    }
+    
+    public int deleteTransaction(TransactionBean bean) {
+        if (-1 == bean.getId()) return 0;
+        
+        synchronized(this.lock) {
+            return this.db.delete(TABLE_TRANSACTION, "_id = ?", new String[] { String.valueOf(bean.getId()) });
         }
     }
 }

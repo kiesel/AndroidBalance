@@ -99,6 +99,7 @@ public class TransactionsListActivity extends Activity {
         Log.i(TAG, "Using following HBCI URL: " + this.account.getHbciUrl());
         HbciAccount acc = Adapter.accountFromBean(this.account);
         HbciSession session = new HbciSession(acc);
+        session.setPassportPath(null);
         session.acquireTransactions();
 
         Transactions ts = acc.getTransactions();
